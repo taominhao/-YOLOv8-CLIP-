@@ -30,9 +30,7 @@ def load_clip():
     model, preprocess = clip.load("ViT-B/32", device=device)
     return model, preprocess, None  # tokenizer 用 clip.tokenize 代替
 
-# 移除美学打分模型相关内容
-# 删除 load_aesthetic_model、deep_aesthetic_score 函数
-# main() 中去掉美学分数相关调用和展示
+
 
 def exposure_score(gray):
     mean_brightness = np.mean(gray)
@@ -171,7 +169,7 @@ def content_score_clip(img, theme, clip_model, clip_preprocess, _):
     return score, status
 
 def main():
-    st.title('AI多维度实时照片打分系统（支持主题表达）')
+    st.title('多维度实时照片打分系统（支持主题表达）')
     st.write('上传照片，输入主题，系统将自动从7个维度分析并打分，给出优化建议。')
     uploaded_file = st.file_uploader('请上传一张照片', type=['jpg', 'jpeg', 'png'])
     theme = st.text_input('请输入本照片的主题词/短语（如“城市夜景”、“自然风光”、“现代建筑”等）', value='风景')
@@ -180,7 +178,7 @@ def main():
         tfile.write(uploaded_file.read())
         img = cv2.imread(tfile.name)
         img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        st.image(img_rgb, caption='原图', use_column_width=True)
+        st.image(img_rgb, caption='原图', use_container_width=True)
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         # 1. 曝光
         exp_score, exp_status, mean_brightness = exposure_score(gray)
@@ -207,7 +205,7 @@ def main():
         st.write(f'色调：{col_score}/100（{col_status}，主色占比{main_color_ratio:.2f}）')
         st.write(f'光影：{ls_score}/100（{ls_status}，对比度{contrast:.2f}）')
         st.write(f'内容表达：{cont_score}/100（{cont_status}，主题：{theme}）')
-        st.image(cv2.cvtColor(vis_img, cv2.COLOR_BGR2RGB), caption='构图分析可视化', use_column_width=True)
+        st.image(cv2.cvtColor(vis_img, cv2.COLOR_BGR2RGB), caption='构图分析可视化', use_container_width=True)
         # 综合得分
         total_score = int(np.mean([exp_score, foc_score, noi_score, comp_score, col_score, ls_score, cont_score]))
         st.subheader('综合得分')
